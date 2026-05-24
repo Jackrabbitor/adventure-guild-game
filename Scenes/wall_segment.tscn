@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://v254jlbu28fq"]
+
+[ext_resource type="Material" uid="uid://crrbvxintyby6" path="res://materials/wall_material.tres" id="1_07dip"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1ucv4"]
+size = Vector3(1, 2, 1)
+
+[node name="WallTile" type="Node3D" unique_id=603061798]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=610016913]
+transform = Transform3D(0.15, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_1ucv4")
+surface_material_override/0 = ExtResource("1_07dip")

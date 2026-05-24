@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://c4ftsi4f7cmcl"]
+
+[ext_resource type="Script" uid="uid://b2klguy56uxqi" path="res://Scenes/grid_manager.gd" id="1_jjgbg"]
+[ext_resource type="PackedScene" uid="uid://dddrvkdroybv1" path="res://Scenes/floor_tile.tscn" id="2_8gbba"]
+[ext_resource type="PackedScene" uid="uid://v254jlbu28fq" path="res://Scenes/wall_segment.tscn" id="3_kry3j"]
+[ext_resource type="PackedScene" uid="uid://ba81tsnggh015" path="res://Scenes/CornerPost.tscn" id="4_21xkr"]
+[ext_resource type="Script" uid="uid://dl0jw8hfxihl2" path="res://Scenes/room_build_tool.gd" id="4_jjvhh"]
+[ext_resource type="Script" uid="uid://brpnn8nqlxtlg" path="res://Scenes/camera_controller.gd" id="6_21xkr"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7u77a"]
+size = Vector2(50, 50)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jjgbg"]
+size = Vector3(50, 0.1, 50)
+
+[node name="Main" type="Node3D" unique_id=2021037424]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=178972745]
+transform = Transform3D(0.70710677, 0.49999997, -0.49999997, 0, 0.70710677, 0.70710677, 0.70710677, -0.49999997, 0.49999997, 0, 0, 0)
+
+[node name="BuildGround" type="StaticBody3D" parent="." unique_id=842979292]
+
+[node name="GroundMesh" type="MeshInstance3D" parent="BuildGround" unique_id=907463355]
+mesh = SubResource("PlaneMesh_7u77a")
+
+[node name="GroundCollision" type="CollisionShape3D" parent="BuildGround" unique_id=1533465430]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+shape = SubResource("BoxShape3D_jjgbg")
+
+[node name="GridManager" type="Node" parent="." unique_id=552137863]
+script = ExtResource("1_jjgbg")
+floor_scene = ExtResource("2_8gbba")
+wall_scene = ExtResource("3_kry3j")
+corner_scene = ExtResource("4_21xkr")
+
+[node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground")]
+script = ExtResource("4_jjvhh")
+camera = NodePath("../CameraRig/Camera3D")
+grid_manager = NodePath("../GridManager")
+build_ground = NodePath("../BuildGround")
+
+[node name="CameraRig" type="Node3D" parent="." unique_id=1625230288 node_paths=PackedStringArray("camera")]
+script = ExtResource("6_21xkr")
+camera = NodePath("Camera3D")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1475522250]
+transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 10, 10)
+projection = 1
+size = 14.0
