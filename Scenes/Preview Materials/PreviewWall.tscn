@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://uh143xhysi20"]
+
+[ext_resource type="Material" uid="uid://el0r41psfbu2" path="res://materials/preview_hologram_material.tres" id="1_1nttx"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rurpg"]
+
+[node name="PreviewWall" type="Node3D" unique_id=841257056]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=608231132]
+transform = Transform3D(0.15, 0, 0, 0, 2, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_rurpg")
+surface_material_override/0 = ExtResource("1_1nttx")

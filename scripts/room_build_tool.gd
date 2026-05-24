@@ -3,6 +3,7 @@ extends Node
 @export var camera: Camera3D
 @export var grid_manager: GridManager
 @export var build_ground: StaticBody3D
+@export var build_preview_manager: BuildPreviewManager
 
 var is_dragging: bool = false
 var drag_start: Vector2i
@@ -18,16 +19,25 @@ func _process(_delta: float) -> void:
 			is_dragging = true
 			print("Started drag at: ", drag_start)
 
+	if is_dragging:
+		var grid_position = get_mouse_grid_position()
+
+		if grid_position != null and build_preview_manager != null:
+			build_preview_manager.show_room_preview(drag_start, grid_position)
+
 	if Input.is_action_just_released("left_click") and is_dragging:
 		var grid_position = get_mouse_grid_position()
 
 		if grid_position != null:
 			drag_end = grid_position
 			print("Ended drag at: ", drag_end)
+
+			if build_preview_manager != null:
+				build_preview_manager.clear_preview()
+
 			build_room(drag_start, drag_end)
 
 		is_dragging = false
-
 
 func get_mouse_grid_position():
 	var mouse_position: Vector2 = get_viewport().get_mouse_position()

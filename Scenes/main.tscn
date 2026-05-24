@@ -1,11 +1,15 @@
 [gd_scene format=3 uid="uid://c4ftsi4f7cmcl"]
 
-[ext_resource type="Script" uid="uid://b2klguy56uxqi" path="res://Scenes/grid_manager.gd" id="1_jjgbg"]
+[ext_resource type="Script" uid="uid://b2klguy56uxqi" path="res://scripts/grid_manager.gd" id="1_jjgbg"]
 [ext_resource type="PackedScene" uid="uid://dddrvkdroybv1" path="res://Scenes/floor_tile.tscn" id="2_8gbba"]
 [ext_resource type="PackedScene" uid="uid://v254jlbu28fq" path="res://Scenes/wall_segment.tscn" id="3_kry3j"]
 [ext_resource type="PackedScene" uid="uid://ba81tsnggh015" path="res://Scenes/CornerPost.tscn" id="4_21xkr"]
-[ext_resource type="Script" uid="uid://dl0jw8hfxihl2" path="res://Scenes/room_build_tool.gd" id="4_jjvhh"]
-[ext_resource type="Script" uid="uid://brpnn8nqlxtlg" path="res://Scenes/camera_controller.gd" id="6_21xkr"]
+[ext_resource type="Script" uid="uid://dl0jw8hfxihl2" path="res://scripts/room_build_tool.gd" id="4_jjvhh"]
+[ext_resource type="Script" uid="uid://brpnn8nqlxtlg" path="res://scripts/camera_controller.gd" id="6_21xkr"]
+[ext_resource type="Script" uid="uid://cwor0f31abtkm" path="res://scripts/build_preview_manager.gd" id="7_6bp64"]
+[ext_resource type="PackedScene" uid="uid://dwwgbrmuy2mcp" path="res://Scenes/Preview Materials/PreviewFloor.tscn" id="8_hptm8"]
+[ext_resource type="PackedScene" uid="uid://uh143xhysi20" path="res://Scenes/Preview Materials/PreviewWall.tscn" id="9_d1ilt"]
+[ext_resource type="PackedScene" uid="uid://d0yi7yitht7n1" path="res://Scenes/Preview Materials/PreviewCorner.tscn" id="10_6iyac"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7u77a"]
 size = Vector2(50, 50)
@@ -33,11 +37,12 @@ floor_scene = ExtResource("2_8gbba")
 wall_scene = ExtResource("3_kry3j")
 corner_scene = ExtResource("4_21xkr")
 
-[node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground")]
+[node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_preview_manager")]
 script = ExtResource("4_jjvhh")
 camera = NodePath("../CameraRig/Camera3D")
 grid_manager = NodePath("../GridManager")
 build_ground = NodePath("../BuildGround")
+build_preview_manager = NodePath("../BuildPreviewManager")
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1625230288 node_paths=PackedStringArray("camera")]
 script = ExtResource("6_21xkr")
@@ -47,3 +52,10 @@ camera = NodePath("Camera3D")
 transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 10, 10)
 projection = 1
 size = 14.0
+
+[node name="BuildPreviewManager" type="Node" parent="." unique_id=467010877 node_paths=PackedStringArray("grid_manager")]
+script = ExtResource("7_6bp64")
+preview_floor_scene = ExtResource("8_hptm8")
+preview_wall_scene = ExtResource("9_d1ilt")
+preview_corner_scene = ExtResource("10_6iyac")
+grid_manager = NodePath("../GridManager")
