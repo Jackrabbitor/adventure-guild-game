@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dwwgbrmuy2mcp" path="res://Scenes/Preview Materials/PreviewFloor.tscn" id="8_hptm8"]
 [ext_resource type="PackedScene" uid="uid://uh143xhysi20" path="res://Scenes/Preview Materials/PreviewWall.tscn" id="9_d1ilt"]
 [ext_resource type="PackedScene" uid="uid://d0yi7yitht7n1" path="res://Scenes/Preview Materials/PreviewCorner.tscn" id="10_6iyac"]
-[ext_resource type="Script" uid="uid://bpi4h2fxbku6m" path="res://scripts/build_mode_manger.gd" id="11_d1ilt"]
+[ext_resource type="Script" uid="uid://bpi4h2fxbku6m" path="res://scripts/build_mode_manager.gd" id="11_d1ilt"]
 [ext_resource type="Shader" uid="uid://d11scrq0jedmx" path="res://materials/build_grid.gdshader" id="12_6iyac"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7u77a"]
@@ -25,6 +25,8 @@ size = Vector2(100, 100)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkdf5"]
 render_priority = 0
 shader = ExtResource("12_6iyac")
+shader_parameter/grid_size = 50.0
+shader_parameter/line_thickness = 0.03
 
 [node name="Main" type="Node3D" unique_id=2021037424]
 
