@@ -20,13 +20,14 @@ size = Vector2(50, 50)
 size = Vector3(50, 0.1, 50)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_fdnlq"]
-size = Vector2(100, 100)
+size = Vector2(50, 50)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkdf5"]
 render_priority = 0
 shader = ExtResource("12_6iyac")
-shader_parameter/grid_size = 50.0
-shader_parameter/line_thickness = 0.03
+shader_parameter/cell_size = 1.0
+shader_parameter/line_width_world = 0.03
+shader_parameter/grid_color = Vector4(0, 0, 0, 0.6)
 
 [node name="Main" type="Node3D" unique_id=2021037424]
 
@@ -42,11 +43,12 @@ mesh = SubResource("PlaneMesh_7u77a")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 shape = SubResource("BoxShape3D_jjgbg")
 
-[node name="GridManager" type="Node" parent="." unique_id=552137863]
+[node name="GridManager" type="Node" parent="." unique_id=552137863 node_paths=PackedStringArray("build_grid_plane")]
 script = ExtResource("1_jjgbg")
 floor_scene = ExtResource("2_8gbba")
 wall_scene = ExtResource("3_kry3j")
 corner_scene = ExtResource("4_21xkr")
+build_grid_plane = NodePath("../BuildGridVisual/GridPlane")
 
 [node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_preview_manager", "build_mode_manager")]
 script = ExtResource("4_jjvhh")

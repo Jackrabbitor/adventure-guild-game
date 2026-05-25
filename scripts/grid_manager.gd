@@ -13,9 +13,13 @@ enum WallDirection {
 	WEST
 }
 
+@export_range(0.01, 64.0, 0.01, "or_greater") var cell_size: float = 2.0
+
 @export var floor_scene: PackedScene
 @export var wall_scene: PackedScene
 @export var corner_scene: PackedScene
+
+@export var build_grid_plane: MeshInstance3D
 
 var floor_types: Dictionary = {}
 var floor_nodes: Dictionary = {}
@@ -24,11 +28,47 @@ var wall_nodes: Dictionary = {}
 var corner_nodes: Dictionary = {}
 
 
+func _ready() -> void:
+	sync_build_grid_shader()
+
+
+func half_cell() -> float:
+	return cell_size * 0.5
+
+
+func cell_center_world(grid_position: Vector2i) -> Vector3:
+	return Vector3(
+		(grid_position.x + 0.5) * cell_size,
+		0.0,
+		(grid_position.y + 0.5) * cell_size
+	)
+
+
 func grid_to_world(grid_position: Vector2i) -> Vector3:
-	return Vector3(grid_position.x, 0, grid_position.y)
+	return cell_center_world(grid_position)
+
+
+func world_to_grid(world_position: Vector3) -> Vector2i:
+	return Vector2i(
+		roundi(world_position.x / cell_size),
+		roundi(world_position.z / cell_size)
+	)
+
+
+func sync_build_grid_shader() -> void:
+	if build_grid_plane == null:
+		return
+
+	var material := build_grid_plane.get_active_material(0)
+
+	if material is ShaderMaterial:
+		material.set_shader_parameter("cell_size", cell_size)
 
 
 func set_floor(grid_position: Vector2i) -> void:
+	if floor_scene == null:
+		return
+
 	if floor_nodes.has(grid_position):
 		floor_nodes[grid_position].queue_free()
 		floor_nodes.erase(grid_position)
@@ -36,7 +76,7 @@ func set_floor(grid_position: Vector2i) -> void:
 	floor_types[grid_position] = FloorType.BASIC
 
 	var new_floor: Node3D = floor_scene.instantiate()
-	new_floor.position = grid_to_world(grid_position)
+	new_floor.position = cell_center_world(grid_position)
 
 	add_child(new_floor)
 	floor_nodes[grid_position] = new_floor
@@ -47,6 +87,9 @@ func get_wall_key(grid_position: Vector2i, direction: WallDirection) -> String:
 
 
 func set_wall(grid_position: Vector2i, direction: WallDirection) -> void:
+	if wall_scene == null:
+		return
+
 	var wall_key: String = get_wall_key(grid_position, direction)
 
 	if wall_nodes.has(wall_key):
@@ -62,32 +105,35 @@ func set_wall(grid_position: Vector2i, direction: WallDirection) -> void:
 
 
 func get_wall_world_position(grid_position: Vector2i, direction: WallDirection) -> Vector3:
-	var x: float = grid_position.x
-	var z: float = grid_position.y
+	var x_min: float = grid_position.x * cell_size
+	var x_max: float = (grid_position.x + 1) * cell_size
+	var z_min: float = grid_position.y * cell_size
+	var z_max: float = (grid_position.y + 1) * cell_size
 
-	if direction == WallDirection.NORTH:
-		return Vector3(x, 0, z + 0.5)
-	elif direction == WallDirection.SOUTH:
-		return Vector3(x, 0, z - 0.5)
-	elif direction == WallDirection.EAST:
-		return Vector3(x + 0.5, 0, z)
-	elif direction == WallDirection.WEST:
-		return Vector3(x - 0.5, 0, z)
+	var x_center: float = x_min + half_cell()
+	var z_center: float = z_min + half_cell()
 
-	return Vector3(x, 0, z)
+	match direction:
+		WallDirection.NORTH:
+			return Vector3(x_center, 0.0, z_max)
+		WallDirection.SOUTH:
+			return Vector3(x_center, 0.0, z_min)
+		WallDirection.EAST:
+			return Vector3(x_max, 0.0, z_center)
+		WallDirection.WEST:
+			return Vector3(x_min, 0.0, z_center)
+
+	return cell_center_world(grid_position)
 
 
 func get_wall_y_rotation(direction: WallDirection) -> float:
-	if direction == WallDirection.NORTH:
-		return 90.0
-	elif direction == WallDirection.SOUTH:
-		return 90.0
-	elif direction == WallDirection.EAST:
-		return 0.0
-	elif direction == WallDirection.WEST:
-		return 0.0
-
-	return 0.0
+	match direction:
+		WallDirection.NORTH, WallDirection.SOUTH:
+			return 90.0
+		WallDirection.EAST, WallDirection.WEST:
+			return 0.0
+		_:
+			return 0.0
 
 
 func get_corner_key(corner_position: Vector2i) -> String:
@@ -95,6 +141,9 @@ func get_corner_key(corner_position: Vector2i) -> String:
 
 
 func set_corner(corner_position: Vector2i) -> void:
+	if corner_scene == null:
+		return
+
 	var corner_key: String = get_corner_key(corner_position)
 
 	if corner_nodes.has(corner_key):
@@ -109,4 +158,19 @@ func set_corner(corner_position: Vector2i) -> void:
 
 
 func get_corner_world_position(corner_position: Vector2i) -> Vector3:
-	return Vector3(corner_position.x * 0.5, 0, corner_position.y * 0.5)
+	return Vector3(
+		corner_position.x * cell_size,
+		0.0,
+		corner_position.y * cell_size
+	)
+
+
+func get_room_corner_lattice_positions(min_cell: Vector2i, max_cell: Vector2i) -> Array[Vector2i]:
+	var corners: Array[Vector2i] = []
+
+	corners.append(Vector2i(min_cell.x, min_cell.y))
+	corners.append(Vector2i(max_cell.x + 1, min_cell.y))
+	corners.append(Vector2i(min_cell.x, max_cell.y + 1))
+	corners.append(Vector2i(max_cell.x + 1, max_cell.y + 1))
+
+	return corners

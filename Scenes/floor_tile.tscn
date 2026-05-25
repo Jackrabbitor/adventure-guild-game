@@ -3,7 +3,7 @@
 [ext_resource type="Material" uid="uid://b10cmsquee06n" path="res://materials/floor_material.tres" id="1_3hdqk"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_xo40o"]
-size = Vector3(1, 0.1, 1)
+size = Vector3(2, 0.1, 2)
 
 [node name="FloorTile" type="Node3D" unique_id=1277832964]
 

@@ -3,10 +3,11 @@
 [ext_resource type="Material" uid="uid://el0r41psfbu2" path="res://materials/preview_hologram_material.tres" id="1_pliws"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_fva7l"]
+size = Vector3(0.36, 4.1, 0.36)
 
 [node name="PreviewCorner" type="Node3D" unique_id=1186108445]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=959556624]
-transform = Transform3D(0.18, 0, 0, 0, 2, 0, 0, 0, 0.18, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("BoxMesh_fva7l")
 surface_material_override/0 = ExtResource("1_pliws")

@@ -5,7 +5,7 @@ extends Node
 
 var build_mode_enabled: bool = false
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("toggle_build_mode"):
 		build_mode_enabled = not build_mode_enabled
 		if build_grid_visual != null:
