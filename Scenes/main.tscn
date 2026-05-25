@@ -10,12 +10,21 @@
 [ext_resource type="PackedScene" uid="uid://dwwgbrmuy2mcp" path="res://Scenes/Preview Materials/PreviewFloor.tscn" id="8_hptm8"]
 [ext_resource type="PackedScene" uid="uid://uh143xhysi20" path="res://Scenes/Preview Materials/PreviewWall.tscn" id="9_d1ilt"]
 [ext_resource type="PackedScene" uid="uid://d0yi7yitht7n1" path="res://Scenes/Preview Materials/PreviewCorner.tscn" id="10_6iyac"]
+[ext_resource type="Script" uid="uid://bpi4h2fxbku6m" path="res://scripts/build_mode_manger.gd" id="11_d1ilt"]
+[ext_resource type="Shader" uid="uid://d11scrq0jedmx" path="res://materials/build_grid.gdshader" id="12_6iyac"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7u77a"]
 size = Vector2(50, 50)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jjgbg"]
 size = Vector3(50, 0.1, 50)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_fdnlq"]
+size = Vector2(100, 100)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jkdf5"]
+render_priority = 0
+shader = ExtResource("12_6iyac")
 
 [node name="Main" type="Node3D" unique_id=2021037424]
 
@@ -37,12 +46,13 @@ floor_scene = ExtResource("2_8gbba")
 wall_scene = ExtResource("3_kry3j")
 corner_scene = ExtResource("4_21xkr")
 
-[node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_preview_manager")]
+[node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_preview_manager", "build_mode_manager")]
 script = ExtResource("4_jjvhh")
 camera = NodePath("../CameraRig/Camera3D")
 grid_manager = NodePath("../GridManager")
 build_ground = NodePath("../BuildGround")
 build_preview_manager = NodePath("../BuildPreviewManager")
+build_mode_manager = NodePath("../BuildModeManger")
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1625230288 node_paths=PackedStringArray("camera")]
 script = ExtResource("6_21xkr")
@@ -59,3 +69,15 @@ preview_floor_scene = ExtResource("8_hptm8")
 preview_wall_scene = ExtResource("9_d1ilt")
 preview_corner_scene = ExtResource("10_6iyac")
 grid_manager = NodePath("../GridManager")
+
+[node name="BuildModeManger" type="Node" parent="." unique_id=272466879 node_paths=PackedStringArray("build_grid_visual")]
+script = ExtResource("11_d1ilt")
+build_grid_visual = NodePath("../BuildGridVisual")
+
+[node name="BuildGridVisual" type="Node3D" parent="." unique_id=1437824453]
+visible = false
+
+[node name="GridPlane" type="MeshInstance3D" parent="BuildGridVisual" unique_id=1680936974]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("PlaneMesh_fdnlq")
+surface_material_override/0 = SubResource("ShaderMaterial_jkdf5")

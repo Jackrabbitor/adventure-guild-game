@@ -4,6 +4,7 @@ extends Node
 @export var grid_manager: GridManager
 @export var build_ground: StaticBody3D
 @export var build_preview_manager: BuildPreviewManager
+@export var build_mode_manager: BuildModeManager
 
 var is_dragging: bool = false
 var drag_start: Vector2i
@@ -11,6 +12,11 @@ var drag_end: Vector2i
 
 
 func _process(_delta: float) -> void:
+	if build_mode_manager == null:
+		return
+	if not build_mode_manager.is_build_mode_enabled():
+		return
+		
 	if Input.is_action_just_pressed("left_click"):
 		var grid_position = get_mouse_grid_position()
 
