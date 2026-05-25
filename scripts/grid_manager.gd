@@ -14,11 +14,12 @@ enum WallDirection {
 }
 
 @export_range(0.01, 64.0, 0.01, "or_greater") var cell_size: float = 2.0
-
+@export var wall_thickness: float = 0.15
+@export var wall_inset_padding: float = 0.03
+@export var wall_end_overlap: float = 0.08
 @export var floor_scene: PackedScene
 @export var wall_scene: PackedScene
 @export var corner_scene: PackedScene
-
 @export var build_grid_plane: MeshInstance3D
 
 var floor_types: Dictionary = {}
@@ -99,6 +100,7 @@ func set_wall(grid_position: Vector2i, direction: WallDirection) -> void:
 	var new_wall: Node3D = wall_scene.instantiate()
 	new_wall.position = get_wall_world_position(grid_position, direction)
 	new_wall.rotation_degrees.y = get_wall_y_rotation(direction)
+	new_wall.scale.z = (cell_size + wall_end_overlap) / cell_size
 
 	add_child(new_wall)
 	wall_nodes[wall_key] = new_wall
@@ -113,15 +115,17 @@ func get_wall_world_position(grid_position: Vector2i, direction: WallDirection) 
 	var x_center: float = x_min + half_cell()
 	var z_center: float = z_min + half_cell()
 
+	var inset: float = (wall_thickness * 0.5) + wall_inset_padding
+
 	match direction:
 		WallDirection.NORTH:
-			return Vector3(x_center, 0.0, z_max)
+			return Vector3(x_center, 0.0, z_max - inset)
 		WallDirection.SOUTH:
-			return Vector3(x_center, 0.0, z_min)
+			return Vector3(x_center, 0.0, z_min + inset)
 		WallDirection.EAST:
-			return Vector3(x_max, 0.0, z_center)
+			return Vector3(x_max - inset, 0.0, z_center)
 		WallDirection.WEST:
-			return Vector3(x_min, 0.0, z_center)
+			return Vector3(x_min + inset, 0.0, z_center)
 
 	return cell_center_world(grid_position)
 
@@ -174,3 +178,49 @@ func get_room_corner_lattice_positions(min_cell: Vector2i, max_cell: Vector2i) -
 	corners.append(Vector2i(max_cell.x + 1, max_cell.y + 1))
 
 	return corners
+func get_room_layout(start: Vector2i, end: Vector2i) -> Dictionary:
+	var min_x: int = mini(start.x, end.x)
+	var max_x: int = maxi(start.x, end.x)
+	var min_z: int = mini(start.y, end.y)
+	var max_z: int = maxi(start.y, end.y)
+
+	var floors: Array[Vector2i] = []
+	var walls: Array[Dictionary] = []
+	var corners: Array[Vector2i] = []
+
+	for x in range(min_x, max_x + 1):
+		for z in range(min_z, max_z + 1):
+			floors.append(Vector2i(x, z))
+
+	for x in range(min_x, max_x + 1):
+		walls.append({
+			"cell": Vector2i(x, min_z),
+			"direction": WallDirection.SOUTH
+		})
+
+		walls.append({
+			"cell": Vector2i(x, max_z),
+			"direction": WallDirection.NORTH
+		})
+
+	for z in range(min_z, max_z + 1):
+		walls.append({
+			"cell": Vector2i(min_x, z),
+			"direction": WallDirection.WEST
+		})
+
+		walls.append({
+			"cell": Vector2i(max_x, z),
+			"direction": WallDirection.EAST
+		})
+
+	var min_cell := Vector2i(min_x, min_z)
+	var max_cell := Vector2i(max_x, max_z)
+	
+	corners = get_room_corner_lattice_positions(min_cell, max_cell)
+
+	return {
+		"floors": floors,
+		"walls": walls,
+		"corners": corners
+	}

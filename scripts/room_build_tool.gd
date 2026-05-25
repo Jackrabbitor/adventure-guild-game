@@ -86,25 +86,18 @@ func get_mouse_grid_position():
 
 
 func build_room(start: Vector2i, end: Vector2i) -> void:
-	var min_x: int = mini(start.x, end.x)
-	var max_x: int = maxi(start.x, end.x)
-	var min_z: int = mini(start.y, end.y)
-	var max_z: int = maxi(start.y, end.y)
+	if grid_manager == null:
+		return
 
-	var min_cell := Vector2i(min_x, min_z)
-	var max_cell := Vector2i(max_x, max_z)
+	var layout: Dictionary = grid_manager.get_room_layout(start, end)
 
-	for x in range(min_x, max_x + 1):
-		for z in range(min_z, max_z + 1):
-			grid_manager.set_floor(Vector2i(x, z))
+	for floor_position in layout["floors"]:
+		grid_manager.set_floor(floor_position)
 
-	for x in range(min_x, max_x + 1):
-		grid_manager.set_wall(Vector2i(x, min_z), grid_manager.WallDirection.SOUTH)
-		grid_manager.set_wall(Vector2i(x, max_z), grid_manager.WallDirection.NORTH)
+	for wall_data in layout["walls"]:
+		grid_manager.set_wall(wall_data["cell"], wall_data["direction"])
 
-	for z in range(min_z, max_z + 1):
-		grid_manager.set_wall(Vector2i(min_x, z), grid_manager.WallDirection.WEST)
-		grid_manager.set_wall(Vector2i(max_x, z), grid_manager.WallDirection.EAST)
-
-	for corner_position in grid_manager.get_room_corner_lattice_positions(min_cell, max_cell):
-		grid_manager.set_corner(corner_position)
+# Indoor rooms do not currently use visible corner posts.
+# Corner layout logic stays in GridManager for future outdoor/structure tools.
+	# for corner_position in layout["corners"]:
+	# 	grid_manager.set_corner(corner_position)
