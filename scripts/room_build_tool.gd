@@ -17,49 +17,76 @@ var drag_end: Vector2i
 
 
 func _process(_delta: float) -> void:
-	# Building allowed only when on
 	if build_mode_manager == null:
 		return
 
 	if not build_mode_manager.is_build_mode_enabled():
 		return
 
-	# Start building from the grid cell under the mouse.
-	if Input.is_action_just_pressed("left_click"):
-		var grid_position = get_mouse_grid_position()
-
-		if grid_position != null:
-			drag_start = grid_position
-			is_dragging = true
-			print("Started drag at: ", drag_start)
-
 	# While dragging, keep updating the hologram preview.
 	if is_dragging:
 		var grid_position = get_mouse_grid_position()
-	
+
 		if grid_position != null and build_preview_manager != null and grid_manager != null:
 			var is_valid: bool = grid_manager.can_build_room(drag_start, grid_position)
 			build_preview_manager.show_room_preview(drag_start, grid_position, is_valid)
 
-	# When the mouse is released, clear the preview and build the real room.
-	if Input.is_action_just_released("left_click") and is_dragging:
-		var grid_position = get_mouse_grid_position()
+#This Handles Click Logic to check if a mouse click is used before dragging
+#Prevents the build tool starting when you click UI elements
+func _unhandled_input(event: InputEvent) -> void:
+	if build_mode_manager == null:
+		return
 
-		if grid_position != null:
-			drag_end = grid_position
-			print("Ended drag at: ", drag_end)
+	if not build_mode_manager.is_build_mode_enabled():
+		return
 
-		if build_preview_manager != null:
-			build_preview_manager.clear_preview()
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			start_room_drag()
 
-		if not grid_manager.can_build_room(drag_start, drag_end):
-			print("Invalid room placement")
-			is_dragging = false
-			return
+		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			finish_room_drag()
 
-		build_room(drag_start, drag_end)
 
+func start_room_drag() -> void:
+	var grid_position = get_mouse_grid_position()
+
+	if grid_position == null:
+		return
+
+	drag_start = grid_position
+	is_dragging = true
+	print("Started drag at: ", drag_start)
+
+
+func finish_room_drag() -> void:
+	if not is_dragging:
+		return
+
+	var grid_position = get_mouse_grid_position()
+
+	if build_preview_manager != null:
+		build_preview_manager.clear_preview()
+
+	if grid_position == null:
 		is_dragging = false
+		return
+
+	drag_end = grid_position
+	print("Ended drag at: ", drag_end)
+
+	if grid_manager == null:
+		is_dragging = false
+		return
+
+	if not grid_manager.can_build_room(drag_start, drag_end):
+		print("Invalid room placement")
+		is_dragging = false
+		return
+
+	build_room(drag_start, drag_end)
+
+	is_dragging = false
 
 
 # Shoots a ray from the camera through the mouse position.
