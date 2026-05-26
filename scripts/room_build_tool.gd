@@ -36,9 +36,10 @@ func _process(_delta: float) -> void:
 	# While dragging, keep updating the hologram preview.
 	if is_dragging:
 		var grid_position = get_mouse_grid_position()
-
-		if grid_position != null and build_preview_manager != null:
-			build_preview_manager.show_room_preview(drag_start, grid_position)
+	
+		if grid_position != null and build_preview_manager != null and grid_manager != null:
+			var is_valid: bool = grid_manager.can_build_room(drag_start, grid_position)
+			build_preview_manager.show_room_preview(drag_start, grid_position, is_valid)
 
 	# When the mouse is released, clear the preview and build the real room.
 	if Input.is_action_just_released("left_click") and is_dragging:
@@ -48,10 +49,15 @@ func _process(_delta: float) -> void:
 			drag_end = grid_position
 			print("Ended drag at: ", drag_end)
 
-			if build_preview_manager != null:
-				build_preview_manager.clear_preview()
+		if build_preview_manager != null:
+			build_preview_manager.clear_preview()
 
-			build_room(drag_start, drag_end)
+		if not grid_manager.can_build_room(drag_start, drag_end):
+			print("Invalid room placement")
+			is_dragging = false
+			return
+
+		build_room(drag_start, drag_end)
 
 		is_dragging = false
 

@@ -11,7 +11,9 @@
 [ext_resource type="PackedScene" uid="uid://uh143xhysi20" path="res://Scenes/Preview Materials/PreviewWall.tscn" id="9_d1ilt"]
 [ext_resource type="PackedScene" uid="uid://d0yi7yitht7n1" path="res://Scenes/Preview Materials/PreviewCorner.tscn" id="10_6iyac"]
 [ext_resource type="Script" uid="uid://bpi4h2fxbku6m" path="res://scripts/build_mode_manager.gd" id="11_d1ilt"]
+[ext_resource type="Material" uid="uid://el0r41psfbu2" path="res://materials/preview_hologram_material.tres" id="11_jkdf5"]
 [ext_resource type="Shader" uid="uid://d11scrq0jedmx" path="res://materials/build_grid.gdshader" id="12_6iyac"]
+[ext_resource type="Material" uid="uid://crrbvxintyby6" path="res://materials/wall_material.tres" id="12_wsu2k"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7u77a"]
 size = Vector2(50, 50)
@@ -72,6 +74,8 @@ script = ExtResource("7_6bp64")
 preview_floor_scene = ExtResource("8_hptm8")
 preview_wall_scene = ExtResource("9_d1ilt")
 preview_corner_scene = ExtResource("10_6iyac")
+valid_preview_material = ExtResource("11_jkdf5")
+invalid_preview_material = ExtResource("12_wsu2k")
 grid_manager = NodePath("../GridManager")
 
 [node name="BuildModeManger" type="Node" parent="." unique_id=272466879 node_paths=PackedStringArray("build_grid_visual")]

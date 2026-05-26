@@ -216,7 +216,17 @@ func get_room_corner_lattice_positions(min_cell: Vector2i, max_cell: Vector2i) -
 
 	return corners
 
-
+#Calcs the room size and store it in a vector for later
+func get_room_size(start: Vector2i, end: Vector2i) -> Vector2i:
+	var min_x: int = mini(start.x, end.x)
+	var max_x: int = maxi(start.x, end.x)
+	var min_z: int = mini(start.y, end.y)
+	var max_z: int = maxi(start.y, end.y)
+	
+	var room_width: int = max_x - min_x + 1
+	var room_height: int = max_z - min_z + 1
+	
+	return Vector2i(room_width, room_height)
 # Builds the shared room layout.
 # This returns the floor cells, wall edges, and possible corner positions.
 # Used by preview too
@@ -266,3 +276,15 @@ func get_room_layout(start: Vector2i, end: Vector2i) -> Dictionary:
 		"walls": walls,
 		"corners": corners
 	}
+#This checks if a room is valid size (greater then 2 squares) and has no room already
+func can_build_room(start: Vector2i, end: Vector2i) -> bool:
+	var room_size: Vector2i = get_room_size(start, end)
+	if room_size.x < 2:
+		return false
+	if room_size.y < 2:
+		return false
+	var room_layout: Dictionary = get_room_layout(start, end)
+	for floor_pos in room_layout["floors"]:
+		if floor_nodes.has(floor_pos): 
+			return false
+	return true

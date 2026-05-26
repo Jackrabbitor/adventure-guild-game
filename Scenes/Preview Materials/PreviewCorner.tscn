@@ -7,7 +7,7 @@ size = Vector3(0.36, 4.1, 0.36)
 
 [node name="PreviewCorner" type="Node3D" unique_id=1186108445]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=959556624]
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=959556624]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("BoxMesh_fva7l")
 surface_material_override/0 = ExtResource("1_pliws")
