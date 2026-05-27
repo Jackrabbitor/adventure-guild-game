@@ -14,6 +14,7 @@
 [ext_resource type="Material" uid="uid://el0r41psfbu2" path="res://materials/preview_hologram_material.tres" id="11_jkdf5"]
 [ext_resource type="Shader" uid="uid://d11scrq0jedmx" path="res://materials/build_grid.gdshader" id="12_6iyac"]
 [ext_resource type="Material" uid="uid://crrbvxintyby6" path="res://materials/wall_material.tres" id="12_wsu2k"]
+[ext_resource type="Script" uid="uid://nlpo7ssekanb" path="res://scripts/delete_build_tool.gd" id="14_k12tt"]
 [ext_resource type="Script" uid="uid://bt7nyv6jmkbte" path="res://scripts/hud.gd" id="15_wsu2k"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7u77a"]
@@ -46,21 +47,6 @@ mesh = SubResource("PlaneMesh_7u77a")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 shape = SubResource("BoxShape3D_jjgbg")
 
-[node name="GridManager" type="Node" parent="." unique_id=552137863 node_paths=PackedStringArray("build_grid_plane")]
-script = ExtResource("1_jjgbg")
-floor_scene = ExtResource("2_8gbba")
-wall_scene = ExtResource("3_kry3j")
-corner_scene = ExtResource("4_21xkr")
-build_grid_plane = NodePath("../BuildGridVisual/GridPlane")
-
-[node name="RoomBuildTool" type="Node" parent="." unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_preview_manager", "build_mode_manager")]
-script = ExtResource("4_jjvhh")
-camera = NodePath("../CameraRig/Camera3D")
-grid_manager = NodePath("../GridManager")
-build_ground = NodePath("../BuildGround")
-build_preview_manager = NodePath("../BuildPreviewManager")
-build_mode_manager = NodePath("../BuildModeManger")
-
 [node name="CameraRig" type="Node3D" parent="." unique_id=1625230288 node_paths=PackedStringArray("camera")]
 script = ExtResource("6_21xkr")
 camera = NodePath("Camera3D")
@@ -69,6 +55,21 @@ camera = NodePath("Camera3D")
 transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 10, 10)
 projection = 1
 size = 14.0
+
+[node name="RoomBuildTool" type="Node" parent="CameraRig" unique_id=378922187 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_preview_manager", "build_mode_manager")]
+script = ExtResource("4_jjvhh")
+camera = NodePath("../Camera3D")
+grid_manager = NodePath("../../GridManager")
+build_ground = NodePath("../../BuildGround")
+build_preview_manager = NodePath("../../BuildPreviewManager")
+build_mode_manager = NodePath("../../BuildModeManger")
+
+[node name="GridManager" type="Node" parent="." unique_id=552137863 node_paths=PackedStringArray("build_grid_plane")]
+script = ExtResource("1_jjgbg")
+floor_scene = ExtResource("2_8gbba")
+wall_scene = ExtResource("3_kry3j")
+corner_scene = ExtResource("4_21xkr")
+build_grid_plane = NodePath("../BuildGridVisual/GridPlane")
 
 [node name="BuildPreviewManager" type="Node" parent="." unique_id=467010877 node_paths=PackedStringArray("grid_manager")]
 script = ExtResource("7_6bp64")
@@ -79,9 +80,17 @@ valid_preview_material = ExtResource("11_jkdf5")
 invalid_preview_material = ExtResource("12_wsu2k")
 grid_manager = NodePath("../GridManager")
 
-[node name="BuildModeManger" type="Node" parent="." unique_id=272466879 node_paths=PackedStringArray("build_grid_visual")]
+[node name="BuildModeManger" type="Node" parent="." unique_id=272466879 node_paths=PackedStringArray("build_grid_visual", "build_tool_panel")]
 script = ExtResource("11_d1ilt")
 build_grid_visual = NodePath("../BuildGridVisual")
+build_tool_panel = NodePath("../UI/HUD/BuildToolPanel")
+
+[node name="DeleteBuildTool" type="Node" parent="." unique_id=788847750 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_mode_manager")]
+script = ExtResource("14_k12tt")
+camera = NodePath("../CameraRig/Camera3D")
+grid_manager = NodePath("../GridManager")
+build_ground = NodePath("../BuildGround")
+build_mode_manager = NodePath("../BuildModeManger")
 
 [node name="BuildGridVisual" type="Node3D" parent="." unique_id=1437824453]
 visible = false
@@ -117,14 +126,38 @@ mouse_filter = 1
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="BuildButton" type="Button" parent="UI/HUD/LeftToolBarPanel/LeftToolBar" unique_id=413182663]
+[node name="BuildModeButton" type="Button" parent="UI/HUD/LeftToolBarPanel/LeftToolBar" unique_id=413182663]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+text = "BUILD 
+MODE"
+
+[node name="BuildToolPanel" type="PanelContainer" parent="UI/HUD" unique_id=2033314460]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.53900003
+anchor_right = 0.846
+anchor_bottom = 0.059000004
+offset_left = 54.119873
+offset_top = -2.0
+offset_right = -35.32007
+offset_bottom = 0.27999496
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/HUD/BuildToolPanel" unique_id=1172276037]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BuildButton" type="Button" parent="UI/HUD/BuildToolPanel/HBoxContainer" unique_id=1604145356]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 text = "BUILD"
 
-[node name="DeleteButton" type="Button" parent="UI/HUD/LeftToolBarPanel/LeftToolBar" unique_id=343061937]
+[node name="DeleteButton" type="Button" parent="UI/HUD/BuildToolPanel/HBoxContainer" unique_id=343061937]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 text = "DELETE"
 
-[connection signal="pressed" from="UI/HUD/LeftToolBarPanel/LeftToolBar/BuildButton" to="BuildModeManger" method="_on_build_button_pressed"]
+[connection signal="pressed" from="UI/HUD/LeftToolBarPanel/LeftToolBar/BuildModeButton" to="BuildModeManger" method="toggle_build_mode"]
+[connection signal="pressed" from="UI/HUD/BuildToolPanel/HBoxContainer/BuildButton" to="BuildModeManger" method="select_room_tool"]
+[connection signal="pressed" from="UI/HUD/BuildToolPanel/HBoxContainer/DeleteButton" to="BuildModeManger" method="on_delete_button_pressed"]

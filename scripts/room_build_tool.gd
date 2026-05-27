@@ -1,20 +1,33 @@
 extends Node
 
-# Handles the player input for room building.
-# This script does not place objects directly; it asks GridManager and BuildPreviewManager.
+# Handles player input for room building.
+# This script does not place objects directly except by asking GridManager and BuildPreviewManager.
+# RoomBuildTool handles the drag interaction; GridManager handles the actual construction data.
 
-# Scene references assigned in the Inspector.
+
+# -------------------------------------------------------------------
+# Inspector references
+# -------------------------------------------------------------------
+
 @export var camera: Camera3D
 @export var grid_manager: GridManager
 @export var build_ground: StaticBody3D
 @export var build_preview_manager: BuildPreviewManager
 @export var build_mode_manager: BuildModeManager
 
-# Tracks the current click-and-drag build action.
+
+# -------------------------------------------------------------------
+# Drag state
+# -------------------------------------------------------------------
+
 var is_dragging: bool = false
 var drag_start: Vector2i
 var drag_end: Vector2i
 
+
+# -------------------------------------------------------------------
+# Per-frame preview update
+# -------------------------------------------------------------------
 
 func _process(_delta: float) -> void:
 	if build_mode_manager == null:
@@ -23,21 +36,43 @@ func _process(_delta: float) -> void:
 	if not build_mode_manager.is_build_mode_enabled():
 		return
 
-	# While dragging, keep updating the hologram preview.
-	if is_dragging:
-		var grid_position = get_mouse_grid_position()
+	if not build_mode_manager.is_room_tool_selected():
+		return
 
-		if grid_position != null and build_preview_manager != null and grid_manager != null:
-			var is_valid: bool = grid_manager.can_build_room(drag_start, grid_position)
-			build_preview_manager.show_room_preview(drag_start, grid_position, is_valid)
+	update_room_preview()
 
-#This Handles Click Logic to check if a mouse click is used before dragging
-#Prevents the build tool starting when you click UI elements
+
+func update_room_preview() -> void:
+	if not is_dragging:
+		return
+
+	var grid_position = get_mouse_grid_position()
+
+	if grid_position == null:
+		return
+
+	if build_preview_manager == null:
+		return
+
+	if grid_manager == null:
+		return
+
+	var is_valid: bool = grid_manager.can_build_room(drag_start, grid_position)
+	build_preview_manager.show_room_preview(drag_start, grid_position, is_valid)
+
+
+# -------------------------------------------------------------------
+# Input handling
+# -------------------------------------------------------------------
+
 func _unhandled_input(event: InputEvent) -> void:
 	if build_mode_manager == null:
 		return
 
 	if not build_mode_manager.is_build_mode_enabled():
+		return
+
+	if not build_mode_manager.is_room_tool_selected():
 		return
 
 	if event is InputEventMouseButton:
@@ -56,6 +91,7 @@ func start_room_drag() -> void:
 
 	drag_start = grid_position
 	is_dragging = true
+
 	print("Started drag at: ", drag_start)
 
 
@@ -65,14 +101,14 @@ func finish_room_drag() -> void:
 
 	var grid_position = get_mouse_grid_position()
 
-	if build_preview_manager != null:
-		build_preview_manager.clear_preview()
+	clear_current_preview()
 
 	if grid_position == null:
 		is_dragging = false
 		return
 
 	drag_end = grid_position
+
 	print("Ended drag at: ", drag_end)
 
 	if grid_manager == null:
@@ -88,6 +124,15 @@ func finish_room_drag() -> void:
 
 	is_dragging = false
 
+
+func clear_current_preview() -> void:
+	if build_preview_manager != null:
+		build_preview_manager.clear_preview()
+
+
+# -------------------------------------------------------------------
+# Mouse/grid helpers
+# -------------------------------------------------------------------
 
 # Shoots a ray from the camera through the mouse position.
 # If it hits the build ground, we convert that world hit position into a grid cell.
@@ -131,7 +176,12 @@ func get_mouse_grid_position():
 	return grid_manager.world_to_grid(hit_position)
 
 
-# Builds the final room using the shared room layout from GridManager.
+# -------------------------------------------------------------------
+# Room construction
+# -------------------------------------------------------------------
+
+# Builds the final room.
+# Floors are placed first, then GridManager rebuilds walls from all existing floors.
 func build_room(start: Vector2i, end: Vector2i) -> void:
 	if grid_manager == null:
 		return
@@ -141,10 +191,4 @@ func build_room(start: Vector2i, end: Vector2i) -> void:
 	for floor_position in layout["floors"]:
 		grid_manager.set_floor(floor_position)
 
-	for wall_data in layout["walls"]:
-		grid_manager.set_wall(wall_data["cell"], wall_data["direction"])
-
-	# Indoor rooms do not currently use visible corner posts.
-	# Corner layout logic stays in GridManager for future outdoor/structure tools.
-	# for corner_position in layout["corners"]:
-	# 	grid_manager.set_corner(corner_position)
+	grid_manager.rebuild_all_walls()
