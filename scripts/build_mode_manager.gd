@@ -25,9 +25,15 @@ func toggle_build_mode() -> void:
 	# The grid should only be visible while build mode is active.
 	if build_grid_visual != null:
 		build_grid_visual.visible = build_mode_enabled
+
+	# The build tool menu should appear only while build mode is active.
 	if build_tool_panel != null:
 		build_tool_panel.visible = build_mode_enabled
-	
+
+	# When opening build mode, default back to the normal room build tool.
+	if build_mode_enabled:
+		select_room_tool()
+
 	print("Build Mode Is ", build_mode_enabled)
 
 

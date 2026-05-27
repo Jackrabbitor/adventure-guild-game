@@ -254,6 +254,24 @@ func remove_floor(grid_position: Vector2i) -> void:
 
 	rebuild_all_walls()
 
+# Removes every floor tile inside a dragged rectangle.
+# Walls are rebuilt once after all floors are removed.
+func remove_floor_area(start: Vector2i, end: Vector2i) -> void:
+	var min_x: int = mini(start.x, end.x)
+	var max_x: int = maxi(start.x, end.x)
+	var min_z: int = mini(start.y, end.y)
+	var max_z: int = maxi(start.y, end.y)
+
+	for x in range(min_x, max_x + 1):
+		for z in range(min_z, max_z + 1):
+			var grid_position := Vector2i(x, z)
+
+			if floor_nodes.has(grid_position):
+				floor_nodes[grid_position].queue_free()
+				floor_nodes.erase(grid_position)
+				floor_types.erase(grid_position)
+
+	rebuild_all_walls()
 
 # -------------------------------------------------------------------
 # Wall placement/rebuilding
@@ -281,7 +299,7 @@ func set_wall(grid_position: Vector2i, direction: WallDirection) -> void:
 
 	# Slightly lengthen the wall so corners overlap cleanly like an indoor room wall.
 	new_wall.scale.z = (cell_size + wall_end_overlap) / cell_size
-
+	
 	add_child(new_wall)
 	wall_nodes[wall_key] = new_wall
 

@@ -85,12 +85,13 @@ script = ExtResource("11_d1ilt")
 build_grid_visual = NodePath("../BuildGridVisual")
 build_tool_panel = NodePath("../UI/HUD/BuildToolPanel")
 
-[node name="DeleteBuildTool" type="Node" parent="." unique_id=788847750 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_mode_manager")]
+[node name="DeleteBuildTool" type="Node" parent="." unique_id=788847750 node_paths=PackedStringArray("camera", "grid_manager", "build_ground", "build_mode_manager", "build_preview_manager")]
 script = ExtResource("14_k12tt")
 camera = NodePath("../CameraRig/Camera3D")
 grid_manager = NodePath("../GridManager")
 build_ground = NodePath("../BuildGround")
 build_mode_manager = NodePath("../BuildModeManger")
+build_preview_manager = NodePath("../BuildPreviewManager")
 
 [node name="BuildGridVisual" type="Node3D" parent="." unique_id=1437824453]
 visible = false
